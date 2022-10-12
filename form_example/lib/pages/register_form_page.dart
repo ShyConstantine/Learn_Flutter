@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,14 +21,29 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final _nameController = TextEditingController();
+  final _catNameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _storyController = TextEditingController();
   final _passController = TextEditingController();
   final _confirmPassController = TextEditingController();
 
-  final List<String> _countries = ['Russia', 'Ukraine', 'Germany', 'France'];
-  String _selectedCountry = 'Russia';
+  final List<String> _catsBreeds = [
+    'Abyssinian',
+    'Aegean',
+    'American Bobtail',
+    'American Curl',
+    'American Ringtail',
+    'American Shorthair',
+    'American Wirehair',
+    'Aphrodite Giant',
+    'Arabian Mau',
+    'Asian',
+    'Asian Semi-longhair',
+    'Australian Mist',
+    'Balinese',
+  ];
+  String _selectedBreed = 'Abyssinian';
 
   final _nameFocus = FocusNode();
   final _phoneFocus = FocusNode();
@@ -38,6 +54,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
   @override
   void dispose() {
     _nameController.dispose();
+    _catNameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
     _storyController.dispose();
@@ -102,6 +119,35 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
             ),
             const SizedBox(height: 10),
             TextFormField(
+              validator: _validateCatName,
+              controller: _catNameController,
+              decoration: InputDecoration(
+                labelText: 'Cat name',
+                hintText: 'How do you call your cat?',
+                helperText: 'Expemple: Masya',
+                prefixIcon: const Icon(Icons.catching_pokemon),
+                suffixIcon: GestureDetector(
+                  onLongPress: () {
+                    _catNameController.clear();
+                  },
+                  child: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.red,
+                  ),
+                ),
+                enabledBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  borderSide: BorderSide(color: Colors.black, width: 2.0),
+                ),
+                focusedBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                ),
+              ),
+              keyboardType: TextInputType.name,
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
               focusNode: _phoneFocus,
               onFieldSubmitted: (_) {
                 _fieldFocusChange(context, _phoneFocus, _passFocus);
@@ -158,21 +204,21 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
               decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   icon: Icon(Icons.map),
-                  labelText: 'Country?'),
-              items: _countries.map((country) {
+                  labelText: 'Chouse cat breed?'),
+              items: _catsBreeds.map((breed) {
                 return DropdownMenuItem(
-                  child: Text(country),
-                  value: country,
+                  child: Text(breed),
+                  value: breed,
                 );
               }).toList(),
-              onChanged: (country) {
-                print(country);
+              onChanged: (breed) {
+                print(breed);
                 setState(() {
-                  _selectedCountry = country as String;
-                  newUser.country = country;
+                  _selectedBreed = breed as String;
+                  newUser.breed = breed;
                 });
               },
-              value: _selectedCountry,
+              value: _selectedBreed,
               // validator: (val) {
               //   return val == null ? 'Please select a country' : null;
               // },
@@ -181,9 +227,9 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
             TextFormField(
               controller: _storyController,
               decoration: const InputDecoration(
-                labelText: 'Life Story',
-                hintText: 'Tell us about your self',
-                helperText: 'Keep it short, this is just a demo',
+                labelText: 'About your cat',
+                hintText: 'Tell us about your cat',
+                helperText: 'For example: cats pedigree, color, weight, sex',
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
@@ -249,14 +295,25 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
       log('Name: ${_nameController.text}');
       log('Phone: ${_phoneController.text}');
       log('Email: ${_emailController.text}');
-      log('Country: $_selectedCountry');
-      log('Story: ${_storyController.text}');
+      log('Country: $_selectedBreed');
+      log('About cat: ${_storyController.text}');
     } else {
       _showMessage(message: 'Form is not valid! Please review and correct');
     }
   }
 
   String? _validateName(String? value) {
+    final _nameExp = RegExp(r'^[A-Za-z ]+$');
+    if (value == null) {
+      return 'Name is reqired.';
+    } else if (!_nameExp.hasMatch(value)) {
+      return 'Please enter alphabetical characters.';
+    } else {
+      return null;
+    }
+  }
+
+  String? _validateCatName(String? value) {
     final _nameExp = RegExp(r'^[A-Za-z ]+$');
     if (value == null) {
       return 'Name is reqired.';
@@ -274,11 +331,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
 
   String? _validateEmail(String? value) {
     if (value == null) {
-      return 'Email cannot be empty';
-    } else if (!_emailController.text.contains('@')) {
-      return 'Invalid email address';
-    } else {
-      return null;
+      return 'Email is empty';
     }
   }
 
