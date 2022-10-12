@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import '../model/user.dart';
 
 class UserInfoPage extends StatelessWidget {
-  final User userInfo;
-  UserInfoPage({Key? key, required this.userInfo}) : super(key: key);
 
+  final User userInfo;
+  const UserInfoPage({Key? key, required this.userInfo}) : super(key: key);
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +28,7 @@ class UserInfoPage extends StatelessWidget {
                 Icons.person,
                 color: Colors.black,
               ),
-              trailing: Text(userInfo.breed),
+              trailing: Text(userInfo.country),
             ),
             ListTile(
               title: Text(
@@ -39,17 +40,16 @@ class UserInfoPage extends StatelessWidget {
                 color: Colors.black,
               ),
             ),
-            if (userInfo.email.isNotEmpty)
-              ListTile(
-                title: Text(
-                  userInfo.email.isEmpty ? 'Not specified' : userInfo.email,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
-                leading: const Icon(
-                  Icons.mail,
-                  color: Colors.black,
-                ),
+            ListTile(
+              title: Text(
+                userInfo.email.isEmpty ? 'Not specified' : userInfo.email,
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
+              leading: const Icon(
+                Icons.mail,
+                color: Colors.black,
+              ),
+            ),
           ],
         ),
       ),
